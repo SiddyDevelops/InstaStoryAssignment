@@ -1,20 +1,21 @@
 package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View.OnTouchListener
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.siddydevelops.instastoryassignment.databinding.ActivityStoryPlayerBinding
 import jp.shts.android.storiesprogressview.StoriesProgressView
 
@@ -23,11 +24,9 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     private lateinit var binding: ActivityStoryPlayerBinding
 
     private var ImageURls: Array<String> = arrayOf()
+    private var imageList: ArrayList<Bitmap> = arrayListOf()
     private var username: String? = null
     private var userProfile: String? = null
-    private var storyTimes: Array<String> = arrayOf()
-    private var likeCounts: Array<String> = arrayOf()
-    private var storyText: Array<String> = arrayOf()
 
     var pressTime = 0L
     var limit = 500L
@@ -89,7 +88,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // on below line we are setting the total count for our stories.
 
         // on below line we are setting the total count for our stories.
-        binding.stories.setStoriesCount(ImageURls.size)
+        binding.stories.setStoriesCount(imageList.size)
 
         // on below line we are setting story duration for each story.
 
@@ -108,8 +107,8 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.stories.startStories(counter)
         binding.stories.pause()
         glideImage(
-            ImageURls[counter],
-            username!!, storyTimes[counter], likeCounts[counter], storyText[counter]
+            imageList[counter],
+            username!!
         )
 
         // below is the view for going to the previous story.
@@ -149,14 +148,14 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.skip.setOnTouchListener(onTouchListener)
     }
 
-    fun Initializing() {
+    private fun Initializing() {
         cls = intent.getSerializableExtra("ClassName") as Class<*>?
-        ImageURls = intent.getStringArrayExtra("IMAGEURLS")!!
+
+        imageList = intent.getParcelableArrayListExtra("IMAGEURLS")!!
+
         username = intent.getStringExtra("USERNAME")
         userProfile = intent.getStringExtra("USERPROFILE")
-        storyTimes = intent.getStringArrayExtra("STORYTIMES")!!
-        likeCounts = intent.getStringArrayExtra("LIEKCOUNT")!!
-        storyText = intent.getStringArrayExtra("STORYTEXT")!!
+        Glide.with(this).load(userProfile).into(binding.profileImage)
     }
 
     override fun onNext() {
@@ -166,8 +165,8 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // this method is called when we move
         // to next progress view of story.
         glideImage(
-            ImageURls[++counter],
-            username!!, storyTimes[counter], likeCounts[counter], storyText[counter]
+            imageList[++counter],
+            username!!
         )
     }
 
@@ -177,8 +176,8 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // on below line we are decreasing our counter
         if (counter - 1 < 0) return
         glideImage(
-            ImageURls[--counter],
-            username!!, storyTimes[counter], likeCounts[counter], storyText[counter]
+            imageList[--counter],
+            username!!
         )
 
         // on below line we are setting image to image view
@@ -201,45 +200,10 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     }
 
     private fun glideImage(
-        URL: String,
-        username: String,
-        time: String,
-        like: String,
-        storyText: String
+        image: Bitmap,
+        username: String
     ) {
-        Glide.with(this)
-            .load(URL)
-            .listener(object : RequestListener<Drawable?> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any,
-                    target: Target<Drawable?>,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    Toast.makeText(
-                        this@StoryPlayerActivity,
-                        "Failed to load image.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.stories.pause()
-                    return false
-                }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any,
-                    target: Target<Drawable?>,
-                    dataSource: DataSource,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    binding.stories.resume()
-                    return false
-                }
-            })
-            .into(binding.image)
+        binding.image.setImageBitmap(image)
         binding.usernameTV.text = username
-        binding.storyTimeTV.text = time
-        binding.likeCountTV.text = like
-        binding.storyTTV.text = storyText
     }
 }

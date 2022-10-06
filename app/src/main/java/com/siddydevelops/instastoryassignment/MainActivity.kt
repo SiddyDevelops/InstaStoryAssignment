@@ -1,37 +1,100 @@
 package com.siddydevelops.instastoryassignment
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.siddydevelops.instastoryassignment.adapters.StoryViewAdapter
 import com.siddydevelops.instastoryassignment.databinding.ActivityMainBinding
+import com.siddydevelops.instastoryassignment.user.User
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 
-class MainActivity : AppCompatActivity() {
+
+open class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
+    private var imageList: ArrayList<Bitmap> = arrayListOf()
+    private var userStories: ArrayList<User> = arrayListOf()
+    private var count = 0
 
-    private var usernameList =
-        arrayOf("Siddharth", "Christina", "Luis Villasmil", "Michael Daze", "Usman Yousaf")
-
-    private var profileImageList = arrayOf(
-        "https://raw.githubusercontent.com/SiddyDevelops/Blogaro/main/Assets/Profile-Images/me_photo.jpg",
-        "https://raw.githubusercontent.com/SiddyDevelops/Blogaro/main/Assets/Profile-Images/christina.jpg",
-        "https://raw.githubusercontent.com/SiddyDevelops/Blogaro/main/Assets/Profile-Images/luis_villasmil.jpg",
-        "https://raw.githubusercontent.com/SiddyDevelops/Blogaro/main/Assets/Profile-Images/michael_daze.jpg",
-        "https://raw.githubusercontent.com/SiddyDevelops/Blogaro/main/Assets/Profile-Images/usman_yousaf.jpg"
-    )
-
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         val root = activityMainBinding.root
         setContentView(root)
 
-        activityMainBinding.storyViewRV.layoutManager =  LinearLayoutManager(
-            this,
-            LinearLayoutManager.HORIZONTAL,
-            false
-        )
-        activityMainBinding.storyViewRV.adapter = StoryViewAdapter(usernameList, profileImageList)
+        activityMainBinding.storyViewRV.layoutManager =  LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        activityMainBinding.selectFromGallery.setOnClickListener {
+            val i = Intent()
+            i.type = "image/*"
+            i.action = Intent.ACTION_GET_CONTENT
+            launchGallery.launch(i)
+        }
+
+        activityMainBinding.selectCamera.setOnClickListener {
+
+        }
+
+        activityMainBinding.addStoryBtn.setOnClickListener {
+            if(activityMainBinding.userNameET.text.isEmpty()) {
+                Toast.makeText(this,"Please enter the username!",Toast.LENGTH_LONG).show()
+            } else {
+                userStories.add(User(activityMainBinding.userNameET.text.toString(),imageList))
+            }
+            activityMainBinding.storyViewRV.adapter = StoryViewAdapter(userStories)
+        }
     }
+
+    private var launchGallery = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode
+            == RESULT_OK
+        ) {
+            val data = result.data
+            // do your operation from here....
+            if (data != null
+                && data.data != null
+            ) {
+                val selectedImageUri: Uri? = data.data
+                var selectedImageBitmap: Bitmap = Bitmap.createBitmap(AppCompatResources.getDrawable(this,R.drawable.ic_image)!!.toBitmap())
+                try {
+                    selectedImageBitmap = MediaStore.Images.Media.getBitmap(
+                        this.contentResolver,
+                        selectedImageUri
+                    )
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+                imageList.add(selectedImageBitmap)
+                count++
+            }
+        }
+    }
+
+    private fun getImageUri(context: Context, inImage: Bitmap): Uri? {
+        val bytes = ByteArrayOutputStream()
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(
+            context.contentResolver,
+            inImage,
+            "Title",
+            null
+        )
+        return Uri.parse(path)
+    }
+
 }
