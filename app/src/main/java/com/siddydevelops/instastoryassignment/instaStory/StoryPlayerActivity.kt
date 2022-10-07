@@ -1,30 +1,28 @@
 package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View.OnTouchListener
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.bumptech.glide.Glide
 import com.siddydevelops.instastoryassignment.databinding.ActivityStoryPlayerBinding
 import jp.shts.android.storiesprogressview.StoriesProgressView
+
 
 class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesListener {
 
     private lateinit var binding: ActivityStoryPlayerBinding
 
     private var ImageURls: Array<String> = arrayOf()
-    private var imageList: ArrayList<Bitmap> = arrayListOf()
+    private var imageList: ArrayList<String> = arrayListOf()
     private var username: String? = null
     private var userProfile: String? = null
 
@@ -151,8 +149,8 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     private fun Initializing() {
         cls = intent.getSerializableExtra("ClassName") as Class<*>?
 
-        imageList = intent.getParcelableArrayListExtra("IMAGEURLS")!!
-
+        imageList = intent.extras?.getStringArrayList("IMAGEURLS")!!
+        Log.d("ImageList->",imageList.toString())
         username = intent.getStringExtra("USERNAME")
         userProfile = intent.getStringExtra("USERPROFILE")
         Glide.with(this).load(userProfile).into(binding.profileImage)
@@ -200,10 +198,10 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     }
 
     private fun glideImage(
-        image: Bitmap,
+        image: String,
         username: String
     ) {
-        binding.image.setImageBitmap(image)
+        binding.image.setImageURI(Uri.parse(image))
         binding.usernameTV.text = username
     }
 }

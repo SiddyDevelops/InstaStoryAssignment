@@ -4,5 +4,5 @@ import android.graphics.Bitmap
 
 data class User(
     val userName: String,
-    val imageList: ArrayList<Bitmap>
+    val imageList: ArrayList<String>
 )

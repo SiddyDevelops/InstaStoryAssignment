@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,12 +21,14 @@ import com.siddydevelops.instastoryassignment.databinding.ActivityMainBinding
 import com.siddydevelops.instastoryassignment.user.User
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import kotlin.collections.ArrayList
 
 
 open class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
-    private var imageList: ArrayList<Bitmap> = arrayListOf()
+    //private var imageList: ArrayList<Bitmap> = arrayListOf()
+    private var imageList: ArrayList<String> = arrayListOf()
     private var userStories: ArrayList<User> = arrayListOf()
     private var count = 0
 
@@ -37,15 +40,13 @@ open class MainActivity : AppCompatActivity() {
         setContentView(root)
 
         activityMainBinding.storyViewRV.layoutManager =  LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+
         activityMainBinding.selectFromGallery.setOnClickListener {
-            val i = Intent()
-            i.type = "image/*"
-            i.action = Intent.ACTION_GET_CONTENT
-            launchGallery.launch(i)
+            selectImageInAlbum()
         }
 
         activityMainBinding.selectCamera.setOnClickListener {
-
+            takePhoto()
         }
 
         activityMainBinding.addStoryBtn.setOnClickListener {
@@ -53,8 +54,23 @@ open class MainActivity : AppCompatActivity() {
                 Toast.makeText(this,"Please enter the username!",Toast.LENGTH_LONG).show()
             } else {
                 userStories.add(User(activityMainBinding.userNameET.text.toString(),imageList))
+                //imageList.clear()
             }
             activityMainBinding.storyViewRV.adapter = StoryViewAdapter(userStories)
+        }
+    }
+
+    private fun selectImageInAlbum() {
+        val i = Intent()
+        i.type = "image/*"
+        i.action = Intent.ACTION_GET_CONTENT
+        launchGallery.launch(i)
+    }
+
+    private fun takePhoto() {
+        val i = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        if (i.resolveActivity(packageManager) != null) {
+            startActivityForResult(i, REQUEST_TAKE_PHOTO)
         }
     }
 
@@ -79,7 +95,7 @@ open class MainActivity : AppCompatActivity() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                imageList.add(selectedImageBitmap)
+                imageList.add(getImageUri(this,selectedImageBitmap).toString())
                 count++
             }
         }
@@ -97,4 +113,8 @@ open class MainActivity : AppCompatActivity() {
         return Uri.parse(path)
     }
 
+    companion object {
+        private val REQUEST_TAKE_PHOTO = 0
+        private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
+    }
 }
