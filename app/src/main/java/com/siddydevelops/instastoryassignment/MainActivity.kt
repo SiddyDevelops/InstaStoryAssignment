@@ -130,8 +130,8 @@ open class MainActivity : AppCompatActivity() {
                 if (resultCode == Activity.RESULT_OK) {
                     val resultUri = uri
                     imgPath = resultUri.path
-                    imageList.add(uri.toString())
                     count++
+                    imageList.add(uri.toString())
                 }
             }
         }
@@ -209,7 +209,6 @@ open class MainActivity : AppCompatActivity() {
             return true
         return false
     }
-
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
