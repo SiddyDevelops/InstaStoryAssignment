@@ -23,26 +23,25 @@ class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.
     }
 
     override fun onBindViewHolder(holder: StoryViewHolder, position: Int) {
-
-        with(holder){
-            with(userStories[position]) {
-                binding.username.text = this.userName
-                binding.frameLayout.setOnClickListener { view ->
-                    val instaStoryViewer = InstaStoryViewer(
-                        view.context,
-                        MainActivity::class.java,
-                        this,
-                        userProfile
-                    )
-                    instaStoryViewer.showStory()
-                }
-            }
-        }
+        holder.bindTo(userStories[position])
     }
 
     override fun getItemCount(): Int {
         return userStories.size
     }
 
-    inner class StoryViewHolder(val binding: StoryItemLayoutBinding) : RecyclerView.ViewHolder(binding.root)
+    inner class StoryViewHolder(val binding: StoryItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bindTo(user: User) {
+            binding.username.text = user.userName
+            binding.frameLayout.setOnClickListener { view ->
+                val instaStoryViewer = InstaStoryViewer(
+                    view.context,
+                    MainActivity::class.java,
+                    user,
+                    userProfile
+                )
+                instaStoryViewer.showStory()
+            }
+        }
+    }
 }
