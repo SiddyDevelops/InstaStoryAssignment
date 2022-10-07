@@ -2,11 +2,8 @@ package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View.OnTouchListener
@@ -20,16 +17,14 @@ import jp.shts.android.storiesprogressview.StoriesProgressView
 class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesListener {
 
     private lateinit var binding: ActivityStoryPlayerBinding
-
-    private var ImageURls: Array<String> = arrayOf()
     private var imageList: ArrayList<String> = arrayListOf()
     private var username: String? = null
     private var userProfile: String? = null
 
-    var pressTime = 0L
-    var limit = 500L
+    private var pressTime = 0L
+    private var limit = 500L
 
-    var cls: Class<*>? = null
+    private var cls: Class<*>? = null
 
     private var counter = 0
 
@@ -77,7 +72,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // inside in create method below line is use to make a full screen.
 
         //Initializing Variables through intent
-        Initializing()
+        init()
 
         // on below line we are initializing our variables.
 
@@ -146,9 +141,8 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.skip.setOnTouchListener(onTouchListener)
     }
 
-    private fun Initializing() {
+    private fun init() {
         cls = intent.getSerializableExtra("ClassName") as Class<*>?
-
         imageList = intent.extras?.getStringArrayList("IMAGEURLS")!!
         Log.d("ImageList->",imageList.toString())
         username = intent.getStringExtra("USERNAME")

@@ -30,7 +30,7 @@ class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.
         return userStories.size
     }
 
-    inner class StoryViewHolder(val binding: StoryItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class StoryViewHolder(private val binding: StoryItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindTo(user: User) {
             binding.username.text = user.userName
             binding.frameLayout.setOnClickListener { view ->
