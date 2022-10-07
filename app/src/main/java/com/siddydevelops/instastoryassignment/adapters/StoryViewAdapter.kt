@@ -31,8 +31,7 @@ class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.
                     val instaStoryViewer = InstaStoryViewer(
                         view.context,
                         MainActivity::class.java,
-                        this.imageList,
-                        this.userName,
+                        this,
                         userProfile
                     )
                     instaStoryViewer.showStory()

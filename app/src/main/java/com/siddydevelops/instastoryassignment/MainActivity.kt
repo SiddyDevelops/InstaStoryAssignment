@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
-import android.util.Base64
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -27,7 +26,6 @@ import kotlin.collections.ArrayList
 open class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
-    //private var imageList: ArrayList<Bitmap> = arrayListOf()
     private var imageList: ArrayList<String> = arrayListOf()
     private var userStories: ArrayList<User> = arrayListOf()
     private var count = 0
@@ -54,7 +52,6 @@ open class MainActivity : AppCompatActivity() {
                 Toast.makeText(this,"Please enter the username!",Toast.LENGTH_LONG).show()
             } else {
                 userStories.add(User(activityMainBinding.userNameET.text.toString(),imageList))
-                //imageList.clear()
             }
             activityMainBinding.storyViewRV.adapter = StoryViewAdapter(userStories)
         }
@@ -97,6 +94,7 @@ open class MainActivity : AppCompatActivity() {
                 }
                 imageList.add(getImageUri(this,selectedImageBitmap).toString())
                 count++
+                activityMainBinding.imageCounter.text = "ImageCount: ${count}"
             }
         }
     }
