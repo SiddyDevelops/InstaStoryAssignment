@@ -22,7 +22,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.internal.ContextUtils.getActivity
 import com.siddydevelops.instastoryassignment.adapters.StoryViewAdapter
 import com.siddydevelops.instastoryassignment.databinding.ActivityMainBinding
 import com.siddydevelops.instastoryassignment.user.User
@@ -32,7 +31,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-
 
 open class MainActivity : AppCompatActivity() {
 
