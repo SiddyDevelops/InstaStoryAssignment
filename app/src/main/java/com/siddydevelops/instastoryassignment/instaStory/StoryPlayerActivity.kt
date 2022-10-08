@@ -1,13 +1,16 @@
 package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.MotionEvent
+import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
+import android.widget.MediaController
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.siddydevelops.instastoryassignment.databinding.ActivityStoryPlayerBinding
@@ -22,7 +25,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     private var userProfile: String? = null
 
     private var pressTime = 0L
-    private var limit = 500L
+    private var limit = 1000L
 
     private var cls: Class<*>? = null
 
@@ -99,10 +102,15 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // below line is use to start stories progress bar.
         binding.stories.startStories(counter)
         binding.stories.pause()
-        glideImage(
-            imageList[counter],
-            username!!
-        )
+
+        if (isImageFile(imageList[counter])) {
+            glideImage(
+                imageList[counter],
+                username!!
+            )
+        } else if (isVideoFile(imageList[counter])) {
+            previewVideo(imageList[counter], username!!)
+        }
 
         // below is the view for going to the previous story.
         // initializing our previous view.
@@ -144,7 +152,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     private fun init() {
         cls = intent.getSerializableExtra("ClassName") as Class<*>?
         imageList = intent.extras?.getStringArrayList("IMAGEURLS")!!
-        Log.d("ImageList->",imageList.toString())
+        Log.d("ImageList->", imageList.toString())
         username = intent.getStringExtra("USERNAME")
         userProfile = intent.getStringExtra("USERPROFILE")
         Glide.with(this).load(userProfile).into(binding.profileImage)
@@ -156,10 +164,15 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
 
         // this method is called when we move
         // to next progress view of story.
-        glideImage(
-            imageList[++counter],
-            username!!
-        )
+        ++counter
+        if (isImageFile(imageList[counter])) {
+            glideImage(
+                imageList[counter],
+                username!!
+            )
+        } else if (isVideoFile(imageList[counter])) {
+            previewVideo(imageList[counter], username!!)
+        }
     }
 
     override fun onPrev() {
@@ -167,10 +180,15 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // this method id called when we move to previous story.
         // on below line we are decreasing our counter
         if (counter - 1 < 0) return
-        glideImage(
-            imageList[--counter],
-            username!!
-        )
+        --counter
+        if(isImageFile(imageList[counter])) {
+            glideImage(
+                imageList[counter],
+                username!!
+            )
+        } else if(isVideoFile(imageList[counter])) {
+            previewVideo(imageList[counter],username!!)
+        }
 
         // on below line we are setting image to image view
     }
@@ -181,7 +199,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         val i = Intent(this@StoryPlayerActivity, cls)
         startActivity(i)
         finish()
-        Log.d("Complete","Complete")
+        Log.d("Complete", "Complete")
     }
 
     override fun onDestroy() {
@@ -195,7 +213,28 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         image: String,
         username: String
     ) {
+        binding.image.visibility = View.VISIBLE
+        binding.video.visibility = View.GONE
         binding.image.setImageURI(Uri.parse(image))
         binding.usernameTV.text = username
+    }
+
+    private fun previewVideo(videoUri: String, username: String) {
+        binding.image.visibility = View.GONE
+        binding.video.visibility = View.VISIBLE
+        binding.video.setVideoURI(Uri.parse(videoUri))
+        binding.video.start()
+    }
+
+    private fun isImageFile(path: String?): Boolean {
+        val cR: ContentResolver = contentResolver
+        val type = cR.getType(Uri.parse(path))
+        return type!!.startsWith("image")
+    }
+
+    private fun isVideoFile(path: String?): Boolean {
+        val cR: ContentResolver = contentResolver
+        val type = cR.getType(Uri.parse(path))
+        return type!!.startsWith("video")
     }
 }

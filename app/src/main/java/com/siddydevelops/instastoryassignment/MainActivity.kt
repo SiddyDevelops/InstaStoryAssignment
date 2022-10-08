@@ -1,16 +1,19 @@
 package com.siddydevelops.instastoryassignment
 
 import android.Manifest
+import android.R.attr
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,7 +33,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 open class MainActivity : AppCompatActivity() {
 
@@ -59,6 +62,10 @@ open class MainActivity : AppCompatActivity() {
             selectImageInAlbum()
         }
 
+        activityMainBinding.chooseVideoFromGallery.setOnClickListener {
+            selectVideoInAlbum()
+        }
+
         activityMainBinding.selectCamera.setOnClickListener {
             takePhoto()
         }
@@ -78,6 +85,13 @@ open class MainActivity : AppCompatActivity() {
         i.type = "image/*"
         i.action = Intent.ACTION_GET_CONTENT
         launchGallery.launch(i)
+    }
+
+    private fun selectVideoInAlbum() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "video/*"
+        intent.action = Intent.ACTION_GET_CONTENT
+        startActivityForResult(Intent.createChooser(intent, "Select Video"), PICK_VIDEO_REQUEST)
     }
 
     private fun takePhoto() {
@@ -133,6 +147,14 @@ open class MainActivity : AppCompatActivity() {
                     count++
                     imageList.add(uri.toString())
                 }
+            }
+
+            PICK_VIDEO_REQUEST -> {
+                val selectedImageUri: Uri = data?.data!!
+                val videoUri = selectedImageUri.path
+                count++
+                imageList.add(selectedImageUri.toString())
+                activityMainBinding.imageCounter.text = "ImageCount: ${count}"
             }
         }
     }
@@ -230,5 +252,6 @@ open class MainActivity : AppCompatActivity() {
         private const val REQUEST_TAKE_PHOTO = 0
         private const val REQUEST_SELECT_IMAGE_IN_ALBUM = 1
         private const val CAMERA_GALLERY_REQUEST_CODE = 100
+        private const val PICK_VIDEO_REQUEST = 110
     }
 }
