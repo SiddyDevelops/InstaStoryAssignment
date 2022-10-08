@@ -11,6 +11,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
 import android.widget.MediaController
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.siddydevelops.instastoryassignment.databinding.ActivityStoryPlayerBinding
@@ -124,6 +125,10 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.reverse.setOnClickListener { // inside on click we are
             // reversing our progress view.
             binding.stories.reverse()
+        }
+
+        binding.likeBtn.setOnClickListener {
+            Toast.makeText(this,"Added like to the story.",Toast.LENGTH_SHORT).show()
         }
 
         // on below line we are calling a set on touch
