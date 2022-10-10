@@ -115,7 +115,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
             retriever.setDataSource(this, Uri.parse(imageList[counter]))
             val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             limit = time!!.toLong()
-            previewVideo(imageList[counter], username!!)
+            previewVideo(imageList[counter])
         }
 
         // below is the view for going to the previous story.
@@ -185,7 +185,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
             retriever.setDataSource(this, Uri.parse(imageList[counter]))
             val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             limit = time!!.toLong()
-            previewVideo(imageList[counter], username!!)
+            previewVideo(imageList[counter])
         }
     }
 
@@ -205,7 +205,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
             retriever.setDataSource(this, Uri.parse(imageList[counter]))
             val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             limit = time!!.toLong()
-            previewVideo(imageList[counter],username!!)
+            previewVideo(imageList[counter])
         }
 
         // on below line we are setting image to image view
@@ -237,7 +237,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.usernameTV.text = username
     }
 
-    private fun previewVideo(videoUri: String, username: String) {
+    private fun previewVideo(videoUri: String) {
         binding.image.visibility = View.GONE
         binding.video.visibility = View.VISIBLE
         binding.video.setVideoURI(Uri.parse(videoUri))

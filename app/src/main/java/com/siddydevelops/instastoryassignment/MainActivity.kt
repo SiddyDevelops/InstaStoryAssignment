@@ -1,12 +1,10 @@
 package com.siddydevelops.instastoryassignment
 
 import android.Manifest
-import android.R.attr
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -14,7 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -152,14 +149,14 @@ open class MainActivity : AppCompatActivity() {
 
             PICK_VIDEO_REQUEST -> {
                 val selectedImageUri: Uri = data?.data!!
-                val videoUri = selectedImageUri.path
-                count++
+                selectedImageUri.path
                 val mediaMetadataRetriever = MediaMetadataRetriever()
                 mediaMetadataRetriever.setDataSource(this,selectedImageUri)
                 val videoTime = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 if(videoTime!!.toLong() > 30000) {
                     Toast.makeText(this,"Please select a video of length less than 30sec.",Toast.LENGTH_SHORT).show()
                 } else {
+                    count++
                     imageList.add(selectedImageUri.toString())
                     activityMainBinding.imageCounter.text = "ImageCount: ${count}"
                 }
