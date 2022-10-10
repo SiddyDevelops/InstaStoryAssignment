@@ -2,13 +2,13 @@ package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
 import android.content.ContentResolver
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
+import android.widget.MediaController
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -27,8 +27,9 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     private var pressTime = 0L
     private var limit = SEC_10
 
+    private lateinit var mediaController: MediaController
+
     private var counter = 0
-    private val retriever = MediaMetadataRetriever()
 
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener =
@@ -42,6 +43,17 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
 
                     // on below line we are pausing our indicator.
                     binding.stories.pause()
+
+//                    if (binding.video.isPlaying) {
+//                        binding.video.pause()
+//                    } else {
+//                        if (this.actionBar?.isShowing == true) {
+//                            binding.video.resume()
+//                            this.actionBar!!.hide()
+//                            mediaController.hide()
+//                        }
+//                    }
+
                     return@OnTouchListener false
                 }
                 MotionEvent.ACTION_UP -> {
@@ -53,6 +65,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
                     val now = System.currentTimeMillis()
 
                     // on below line we are resuming our progress bar for status.
+                    //binding.video.resume()
                     binding.stories.resume()
 
                     // on below line we are returning if the limit < now - presstime
@@ -103,6 +116,10 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         }
 
         binding.skip.setOnTouchListener(onTouchListener)
+
+        mediaController = MediaController(this)
+        binding.video.setMediaController(mediaController)
+        mediaController.hide()
     }
 
     private fun init() {
@@ -114,11 +131,6 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     }
 
     override fun onNext() {
-        // this method is called when we move
-        // to next progress view of story.
-
-        // this method is called when we move
-        // to next progress view of story.
         ++counter
         if (isImageFile(imageList[counter])) {
             limit = SEC_10
@@ -164,6 +176,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.usernameTV.text = username
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun previewVideo(videoUri: String) {
         binding.image.visibility = View.GONE
         binding.video.visibility = View.VISIBLE
