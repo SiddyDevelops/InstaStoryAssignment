@@ -127,9 +127,6 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
                 username!!
             )
         } else if (isVideoFile(imageList[counter])) {
-            retriever.setDataSource(this, Uri.parse(imageList[counter]))
-            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            limit = time!!.toLong()
             previewVideo(imageList[counter])
         }
     }
@@ -144,9 +141,6 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
                 username!!
             )
         } else if(isVideoFile(imageList[counter])) {
-            retriever.setDataSource(this, Uri.parse(imageList[counter]))
-            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            limit = time!!.toLong()
             previewVideo(imageList[counter])
         }
     }
