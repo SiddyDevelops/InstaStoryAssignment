@@ -2,11 +2,9 @@ package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
 import android.content.ContentResolver
-import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -22,13 +20,12 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
 
     private lateinit var binding: ActivityStoryPlayerBinding
     private var imageList: ArrayList<String> = arrayListOf()
+    private var durationList: ArrayList<String> = arrayListOf()
     private var username: String? = null
     private var userProfile: String? = null
 
     private var pressTime = 0L
     private var limit = SEC_10
-
-    private var cls: Class<*>? = null
 
     private var counter = 0
     private val retriever = MediaMetadataRetriever()
@@ -71,64 +68,27 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         val root = binding.root
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(root)
-        // inside in create method below line is use to make a full screen.
 
-        //Initializing Variables through intent
-        // inside in create method below line is use to make a full screen.
-
-        //Initializing Variables through intent
         init()
-
-        // on below line we are initializing our variables.
-
-        // on below line we are initializing our variables.
-
-        // on below line we are setting the total count for our stories.
-
-        // on below line we are setting the total count for our stories.
-        binding.stories.setStoriesCount(imageList.size)
-
-        // on below line we are setting story duration for each story.
-
-        // on below line we are setting story duration for each story.
-        binding.stories.setStoryDuration(limit)
-
-        // on below line we are calling a method for set
-        // on story listener and passing context to it.
-
-        // on below line we are calling a method for set
-        // on story listener and passing context to it.
+        val durations = LongArray(durationList.size)
+        for(i in 0 until durationList.size) {
+            durations[i] = durationList[i].toLong()
+        }
+        binding.stories.setStoriesCountWithDurations(durations)
         binding.stories.setStoriesListener(this)
-        // below line is use to start stories progress bar.
-
-        // below line is use to start stories progress bar.
         binding.stories.startStories(counter)
         binding.stories.pause()
 
         if (isImageFile(imageList[counter])) {
-            limit = SEC_10
             glideImage(
                 imageList[counter],
                 username!!
             )
         } else if (isVideoFile(imageList[counter])) {
-            retriever.setDataSource(this, Uri.parse(imageList[counter]))
-            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-            limit = time!!.toLong()
             previewVideo(imageList[counter])
         }
 
-        // below is the view for going to the previous story.
-        // initializing our previous view.
-
-        // below is the view for going to the previous story.
-        // initializing our previous view.
-
-        // adding on click listener for our reverse view.
-
-        // adding on click listener for our reverse view.
-        binding.reverse.setOnClickListener { // inside on click we are
-            // reversing our progress view.
+        binding.reverse.setOnClickListener {
             binding.stories.reverse()
         }
 
@@ -136,33 +96,18 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
             Toast.makeText(this,"Added like to the story.",Toast.LENGTH_SHORT).show()
         }
 
-        // on below line we are calling a set on touch
-        // listener method to move towards previous image.
-
-        // on below line we are calling a set on touch
-        // listener method to move towards previous image.
         binding.reverse.setOnTouchListener(onTouchListener)
 
-        // on below line we are initializing
-        // view to skip a specific story.
-
-        // on below line we are initializing
-        // view to skip a specific story.
-        binding.skip.setOnClickListener { // inside on click we are
-            // skipping the story progress view.
+        binding.skip.setOnClickListener {
             binding.stories.skip()
         }
-        // on below line we are calling a set on touch
-        // listener method to move to next story.
-        // on below line we are calling a set on touch
-        // listener method to move to next story.
+
         binding.skip.setOnTouchListener(onTouchListener)
     }
 
     private fun init() {
-        cls = intent.getSerializableExtra("ClassName") as Class<*>?
         imageList = intent.extras?.getStringArrayList("IMAGEURLS")!!
-        Log.d("ImageList->", imageList.toString())
+        durationList = intent.extras?.getStringArrayList("DURATIONLIST")!!
         username = intent.getStringExtra("USERNAME")
         userProfile = intent.getStringExtra("USERPROFILE")
         Glide.with(this).load(userProfile).into(binding.profileImage)
@@ -190,9 +135,6 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     }
 
     override fun onPrev() {
-
-        // this method id called when we move to previous story.
-        // on below line we are decreasing our counter
         if (counter - 1 < 0) return
         --counter
         if(isImageFile(imageList[counter])) {
@@ -207,22 +149,13 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
             limit = time!!.toLong()
             previewVideo(imageList[counter])
         }
-
-        // on below line we are setting image to image view
     }
 
     override fun onComplete() {
-        // when the stories are completed this method is called.
-        // in this method we are moving back to initial main activity.
-        val i = Intent(this@StoryPlayerActivity, cls)
-        startActivity(i)
         finish()
-        Log.d("Complete", "Complete")
     }
 
     override fun onDestroy() {
-        // in on destroy method we are destroying
-        // our stories progress view.
         binding.stories.destroy()
         super.onDestroy()
     }

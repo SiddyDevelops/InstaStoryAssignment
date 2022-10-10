@@ -1,16 +1,12 @@
 package com.siddydevelops.instastoryassignment.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.siddydevelops.instastoryassignment.MainActivity
-import com.siddydevelops.instastoryassignment.R
 import com.siddydevelops.instastoryassignment.databinding.StoryItemLayoutBinding
-import com.siddydevelops.instastoryassignment.instaStory.InstaStoryViewer
+import com.siddydevelops.instastoryassignment.instaStory.StoryPlayerActivity
 import com.siddydevelops.instastoryassignment.user.User
 
 class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.Adapter<StoryViewAdapter.StoryViewHolder>() {
@@ -34,13 +30,12 @@ class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.
         fun bindTo(user: User) {
             binding.username.text = user.userName
             binding.frameLayout.setOnClickListener { view ->
-                val instaStoryViewer = InstaStoryViewer(
-                    view.context,
-                    MainActivity::class.java,
-                    user,
-                    userProfile
-                )
-                instaStoryViewer.showStory()
+                val intent = Intent(view.context, StoryPlayerActivity::class.java)
+                intent.putStringArrayListExtra("IMAGEURLS", user.imageList)
+                intent.putStringArrayListExtra("DURATIONLIST", user.durationList)
+                intent.putExtra("USERNAME", user.userName)
+                intent.putExtra("USERPROFILE", userProfile)
+                view.context.startActivity(intent)
             }
         }
     }
