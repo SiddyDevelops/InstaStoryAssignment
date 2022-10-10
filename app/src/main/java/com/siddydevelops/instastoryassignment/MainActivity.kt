@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -153,8 +154,15 @@ open class MainActivity : AppCompatActivity() {
                 val selectedImageUri: Uri = data?.data!!
                 val videoUri = selectedImageUri.path
                 count++
-                imageList.add(selectedImageUri.toString())
-                activityMainBinding.imageCounter.text = "ImageCount: ${count}"
+                val mediaMetadataRetriever = MediaMetadataRetriever()
+                mediaMetadataRetriever.setDataSource(this,selectedImageUri)
+                val videoTime = mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                if(videoTime!!.toLong() > 30000) {
+                    Toast.makeText(this,"Please select a video of length less than 30sec.",Toast.LENGTH_SHORT).show()
+                } else {
+                    imageList.add(selectedImageUri.toString())
+                    activityMainBinding.imageCounter.text = "ImageCount: ${count}"
+                }
             }
         }
     }

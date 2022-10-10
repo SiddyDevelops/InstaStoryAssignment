@@ -3,6 +3,7 @@ package com.siddydevelops.instastoryassignment.instaStory
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Intent
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +11,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
-import android.widget.MediaController
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -26,11 +26,12 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     private var userProfile: String? = null
 
     private var pressTime = 0L
-    private var limit = 1000L
+    private var limit = SEC_10
 
     private var cls: Class<*>? = null
 
     private var counter = 0
+    private val retriever = MediaMetadataRetriever()
 
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener =
@@ -90,7 +91,7 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // on below line we are setting story duration for each story.
 
         // on below line we are setting story duration for each story.
-        binding.stories.setStoryDuration(3000L)
+        binding.stories.setStoryDuration(limit)
 
         // on below line we are calling a method for set
         // on story listener and passing context to it.
@@ -105,11 +106,15 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         binding.stories.pause()
 
         if (isImageFile(imageList[counter])) {
+            limit = SEC_10
             glideImage(
                 imageList[counter],
                 username!!
             )
         } else if (isVideoFile(imageList[counter])) {
+            retriever.setDataSource(this, Uri.parse(imageList[counter]))
+            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            limit = time!!.toLong()
             previewVideo(imageList[counter], username!!)
         }
 
@@ -171,11 +176,15 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         // to next progress view of story.
         ++counter
         if (isImageFile(imageList[counter])) {
+            limit = SEC_10
             glideImage(
                 imageList[counter],
                 username!!
             )
         } else if (isVideoFile(imageList[counter])) {
+            retriever.setDataSource(this, Uri.parse(imageList[counter]))
+            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            limit = time!!.toLong()
             previewVideo(imageList[counter], username!!)
         }
     }
@@ -187,11 +196,15 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         if (counter - 1 < 0) return
         --counter
         if(isImageFile(imageList[counter])) {
+            limit = SEC_10
             glideImage(
                 imageList[counter],
                 username!!
             )
         } else if(isVideoFile(imageList[counter])) {
+            retriever.setDataSource(this, Uri.parse(imageList[counter]))
+            val time = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            limit = time!!.toLong()
             previewVideo(imageList[counter],username!!)
         }
 
@@ -241,5 +254,10 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         val cR: ContentResolver = contentResolver
         val type = cR.getType(Uri.parse(path))
         return type!!.startsWith("video")
+    }
+
+    companion object {
+        private const val SEC_10 = 10000L
+        private const val SEC_30 = 30000L
     }
 }
