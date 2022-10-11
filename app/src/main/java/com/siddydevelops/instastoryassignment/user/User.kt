@@ -1,7 +1,15 @@
 package com.siddydevelops.instastoryassignment.user
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class User(
-    val userName: String,
-    val imageList: ArrayList<String>,
-    val durationList: ArrayList<String>
-)
+    var data: ArrayList<UserData>
+) : Parcelable
+
+@Parcelize
+data class UserData(
+    val image: String,
+    val type: String
+) : Parcelable

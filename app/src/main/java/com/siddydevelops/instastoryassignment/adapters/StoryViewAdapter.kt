@@ -28,13 +28,9 @@ class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.
 
     inner class StoryViewHolder(private val binding: StoryItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindTo(user: User) {
-            binding.username.text = user.userName
             binding.frameLayout.setOnClickListener { view ->
                 val intent = Intent(view.context, StoryPlayerActivity::class.java)
-                intent.putStringArrayListExtra("IMAGEURLS", user.imageList)
-                intent.putStringArrayListExtra("DURATIONLIST", user.durationList)
-                intent.putExtra("USERNAME", user.userName)
-                intent.putExtra("USERPROFILE", userProfile)
+                intent.putParcelableArrayListExtra("IMAGEURLS", user.data)
                 view.context.startActivity(intent)
             }
         }

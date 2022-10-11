@@ -1,77 +1,64 @@
 package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
-import android.content.ContentResolver
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.WindowManager
-import android.widget.MediaController
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.audio.AudioAttributes
 import com.siddydevelops.instastoryassignment.databinding.ActivityStoryPlayerBinding
+import com.siddydevelops.instastoryassignment.user.UserData
 import jp.shts.android.storiesprogressview.StoriesProgressView
 
 
 class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesListener {
 
     private lateinit var binding: ActivityStoryPlayerBinding
-    private var imageList: ArrayList<String> = arrayListOf()
-    private var durationList: ArrayList<String> = arrayListOf()
-    private var username: String? = null
-    private var userProfile: String? = null
+    private var imageList: ArrayList<UserData> = arrayListOf()
 
     private var pressTime = 0L
     private var limit = SEC_10
-
-    private lateinit var mediaController: MediaController
-
     private var counter = 0
+
+    private lateinit var player: ExoPlayer
 
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener =
         OnTouchListener { _, motionEvent ->
-            when (motionEvent.action) {
-                MotionEvent.ACTION_DOWN -> {
-
-                    // on action down when we press our screen
-                    // the story will pause for specific time.
-                    pressTime = System.currentTimeMillis()
-
-                    // on below line we are pausing our indicator.
-                    binding.stories.pause()
-
-//                    if (binding.video.isPlaying) {
-//                        binding.video.pause()
-//                    } else {
-//                        if (this.actionBar?.isShowing == true) {
-//                            binding.video.resume()
-//                            this.actionBar!!.hide()
-//                            mediaController.hide()
-//                        }
-//                    }
-
-                    return@OnTouchListener false
-                }
-                MotionEvent.ACTION_UP -> {
-
-                    /*
-                    in action up case when user do not touches
-                    screen this method will skip to next image.
-                    */
-                    val now = System.currentTimeMillis()
-
-                    // on below line we are resuming our progress bar for status.
-                    //binding.video.resume()
-                    binding.stories.resume()
-
-                    // on below line we are returning if the limit < now - presstime
-                    return@OnTouchListener limit < now - pressTime
-                }
-            }
+//            when (motionEvent.action) {
+//                MotionEvent.ACTION_DOWN -> {
+//
+//                    // on action down when we press our screen
+//                    // the story will pause for specific time.
+//                    pressTime = System.currentTimeMillis()
+//
+//                    // on below line we are pausing our indicator.
+//                    binding.stories.pause()
+//                    return@OnTouchListener false
+//                }
+//                MotionEvent.ACTION_UP -> {
+//
+//                    /*
+//                    in action up case when user do not touches
+//                    screen this method will skip to next image.
+//                    */
+//                    val now = System.currentTimeMillis()
+//
+//                    // on below line we are resuming our progress bar for status.
+//                    //binding.stories.resume()
+//
+//                    // on below line we are returning if the limit < now - presstime
+//                    return@OnTouchListener limit < now - pressTime
+//                }
+//            }
             false
         }
 
@@ -82,23 +69,22 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN)
         setContentView(root)
 
-        init()
-        val durations = LongArray(durationList.size)
-        for(i in 0 until durationList.size) {
-            durations[i] = durationList[i].toLong()
-        }
-        binding.stories.setStoriesCountWithDurations(durations)
+        // Get Stories From Intent
+        imageList = intent.getParcelableArrayListExtra<UserData>("IMAGEURLS")!!
+
+        binding.stories.setStoriesCount(imageList.size)
         binding.stories.setStoriesListener(this)
         binding.stories.startStories(counter)
-        binding.stories.pause()
+
+        player = ExoPlayer.Builder(this).build()
+        binding.video.player = player
 
         if (isImageFile(imageList[counter])) {
             glideImage(
-                imageList[counter],
-                username!!
+                imageList[counter].image
             )
-        } else if (isVideoFile(imageList[counter])) {
-            previewVideo(imageList[counter])
+        } else {
+            previewVideo(imageList[counter].image)
         }
 
         binding.reverse.setOnClickListener {
@@ -116,44 +102,32 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
         }
 
         binding.skip.setOnTouchListener(onTouchListener)
-
-        mediaController = MediaController(this)
-        binding.video.setMediaController(mediaController)
-        mediaController.hide()
-    }
-
-    private fun init() {
-        imageList = intent.extras?.getStringArrayList("IMAGEURLS")!!
-        durationList = intent.extras?.getStringArrayList("DURATIONLIST")!!
-        username = intent.getStringExtra("USERNAME")
-        userProfile = intent.getStringExtra("USERPROFILE")
-        Glide.with(this).load(userProfile).into(binding.profileImage)
     }
 
     override fun onNext() {
+        player.pause()
         ++counter
         if (isImageFile(imageList[counter])) {
             limit = SEC_10
             glideImage(
-                imageList[counter],
-                username!!
+                imageList[counter].image
             )
-        } else if (isVideoFile(imageList[counter])) {
-            previewVideo(imageList[counter])
+        } else {
+            previewVideo(imageList[counter].image)
         }
     }
 
     override fun onPrev() {
+        player.pause()
         if (counter - 1 < 0) return
         --counter
         if(isImageFile(imageList[counter])) {
             limit = SEC_10
             glideImage(
-                imageList[counter],
-                username!!
+                imageList[counter].image
             )
-        } else if(isVideoFile(imageList[counter])) {
-            previewVideo(imageList[counter])
+        } else {
+            previewVideo(imageList[counter].image)
         }
     }
 
@@ -167,33 +141,43 @@ class StoryPlayerActivity : AppCompatActivity(), StoriesProgressView.StoriesList
     }
 
     private fun glideImage(
-        image: String,
-        username: String
+        image: String
     ) {
         binding.image.visibility = View.VISIBLE
         binding.video.visibility = View.GONE
-        binding.image.setImageURI(Uri.parse(image))
-        binding.usernameTV.text = username
+
+        Glide.with(this).load(image).into(binding.image)
+        binding.stories.setStoryDuration(SEC_10)
+        binding.stories.startStories(counter)
+        binding.stories.pause()
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun previewVideo(videoUri: String) {
         binding.image.visibility = View.GONE
         binding.video.visibility = View.VISIBLE
-        binding.video.setVideoURI(Uri.parse(videoUri))
-        binding.video.start()
+        binding.progressBar.visibility = View.VISIBLE
+        binding.stories.pause()
+
+        val mediaItem = MediaItem.fromUri(videoUri)
+        player.addMediaItem(mediaItem)
+        player.prepare()
+        player.play()
+        player.setAudioAttributes(AudioAttributes.DEFAULT,  /* handleAudioFocus= */true)
+        player.playWhenReady = true
+        player.addListener(object : Player.Listener {
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                if (playbackState == ExoPlayer.STATE_READY) {
+                    binding.stories.setStoryDuration(player.getDuration())
+                    binding.progressBar.visibility = View.GONE
+                    //binding.stories.resume()
+                }
+            }
+        })
     }
 
-    private fun isImageFile(path: String?): Boolean {
-        val cR: ContentResolver = contentResolver
-        val type = cR.getType(Uri.parse(path))
-        return type!!.startsWith("image")
-    }
-
-    private fun isVideoFile(path: String?): Boolean {
-        val cR: ContentResolver = contentResolver
-        val type = cR.getType(Uri.parse(path))
-        return type!!.startsWith("video")
+    private fun isImageFile(data: UserData): Boolean {
+        return (data.type == "image")
     }
 
     companion object {
