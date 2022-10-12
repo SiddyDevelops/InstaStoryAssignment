@@ -43,6 +43,9 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
                     if (playbackState == ExoPlayer.STATE_READY) {
                         binding.progressBar.visibility = View.GONE
                     }
+                    if(playbackState == ExoPlayer.STATE_ENDED) {
+                        player.seekTo(0)
+                    }
                 }
             })
         }
