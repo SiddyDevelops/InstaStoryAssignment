@@ -1,5 +1,6 @@
 package com.siddydevelops.instastoryassignment
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -7,6 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.siddydevelops.instastoryassignment.adapters.StoryViewAdapter
 import com.siddydevelops.instastoryassignment.databinding.ActivityMainBinding
+import com.siddydevelops.instastoryassignment.reels.ReelsActivity
 import com.siddydevelops.instastoryassignment.user.User
 import com.siddydevelops.instastoryassignment.user.UserData
 import kotlin.collections.ArrayList
@@ -35,5 +37,10 @@ open class MainActivity : AppCompatActivity() {
         data.add(User(imageList))
 
         activityMainBinding.storyViewRV.adapter = StoryViewAdapter(data)
+
+        activityMainBinding.reelsBtn.setOnClickListener {
+            val intent = Intent(this,ReelsActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
