@@ -11,8 +11,6 @@ import com.siddydevelops.instastoryassignment.user.User
 
 class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.Adapter<StoryViewAdapter.StoryViewHolder>() {
 
-    private val userProfile = "https://raw.githubusercontent.com/SiddyDevelops/Blogaro/main/Assets/Profile-Images/me_photo.jpg"
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
         val binding = StoryItemLayoutBinding.inflate(LayoutInflater.from(parent.context),parent,false)
         return StoryViewHolder(binding)

@@ -10,11 +10,12 @@ import com.siddydevelops.instastoryassignment.user.UserData
 
 class ReelsActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityReelsBinding
+    private val binding by lazy {
+        ActivityReelsBinding.inflate(layoutInflater)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityReelsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val videoList: ArrayList<String> = arrayListOf()
