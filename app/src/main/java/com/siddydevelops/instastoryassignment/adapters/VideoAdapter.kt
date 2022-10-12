@@ -47,12 +47,6 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
                         ExoPlayer.STATE_ENDED -> {
                             player.seekTo(0)
                         }
-                        Player.STATE_BUFFERING -> {
-                            TODO()
-                        }
-                        Player.STATE_IDLE -> {
-                            TODO()
-                        }
                     }
                 }
             })

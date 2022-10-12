@@ -18,9 +18,11 @@ class ReelsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
-        val videoList: ArrayList<String> = arrayListOf()
-        videoList.add("https://sample-videos.com/video123/mp4/480/big_buck_bunny_480p_5mb.mp4")
-        videoList.add("http://techslides.com/demos/sample-videos/small.mp4")
+//        val videoList: ArrayList<String> = arrayListOf()
+//        videoList.add("https://sample-videos.com/video123/mp4/480/big_buck_bunny_480p_5mb.mp4")
+//        videoList.add("http://techslides.com/demos/sample-videos/small.mp4")
+
+        val videoList: ArrayList<String> = intent.getStringArrayListExtra("VideoList") as ArrayList<String>
 
         binding.viewPager.adapter = VideoAdapter(videoList)
     }
