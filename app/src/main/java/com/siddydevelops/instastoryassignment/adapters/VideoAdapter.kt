@@ -40,11 +40,19 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
             player.playWhenReady = true
             player.addListener(object : Player.Listener {
                 override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                    if (playbackState == ExoPlayer.STATE_READY) {
-                        binding.progressBar.visibility = View.GONE
-                    }
-                    if(playbackState == ExoPlayer.STATE_ENDED) {
-                        player.seekTo(0)
+                    when (playbackState) {
+                        ExoPlayer.STATE_READY -> {
+                            binding.progressBar.visibility = View.GONE
+                        }
+                        ExoPlayer.STATE_ENDED -> {
+                            player.seekTo(0)
+                        }
+                        Player.STATE_BUFFERING -> {
+                            TODO()
+                        }
+                        Player.STATE_IDLE -> {
+                            TODO()
+                        }
                     }
                 }
             })
