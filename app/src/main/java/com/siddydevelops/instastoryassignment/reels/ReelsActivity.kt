@@ -2,6 +2,7 @@ package com.siddydevelops.instastoryassignment.reels
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.google.android.exoplayer2.ExoPlayer
 import com.siddydevelops.instastoryassignment.R
 import com.siddydevelops.instastoryassignment.adapters.VideoAdapter
@@ -23,7 +24,7 @@ class ReelsActivity : AppCompatActivity() {
 //        videoList.add("http://techslides.com/demos/sample-videos/small.mp4")
 
         val videoList: ArrayList<String> = intent.getStringArrayListExtra("VideoList") as ArrayList<String>
-
-        binding.viewPager.adapter = VideoAdapter(videoList)
+        PagerSnapHelper().attachToRecyclerView(binding.recyclerView)
+        binding.recyclerView.adapter = VideoAdapter(videoList)
     }
 }
