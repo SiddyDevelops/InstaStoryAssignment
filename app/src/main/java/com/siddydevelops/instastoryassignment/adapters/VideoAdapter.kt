@@ -6,21 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.siddydevelops.instastoryassignment.databinding.VideoItemLayoutBinding
 
-class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
+class VideoAdapter(private val videoList: ArrayList<String>) :
+    RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
-        val binding = VideoItemLayoutBinding.inflate(LayoutInflater.from(parent.context),parent,false)
+        val binding =
+            VideoItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return VideoHolder(binding)
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
-        Log.d("Position",position.toString())
         holder.bindTo(videoList[position])
     }
 
@@ -28,8 +30,10 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
         return videoList.size
     }
 
-    open class VideoHolder(private val binding: VideoItemLayoutBinding) : RecyclerView.ViewHolder(binding.root) {
+    open class VideoHolder(private val binding: VideoItemLayoutBinding) :
+        ViewHolder(binding.root) {
         fun bindTo(videoUrl: String) {
+            Log.d("Play","True")
             val player = ExoPlayer.Builder(binding.root.context).build()
             binding.videoView.player = player
             binding.progressBar.visibility = View.VISIBLE
@@ -38,7 +42,7 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
             player.addMediaItem(mediaItem)
             player.prepare()
             player.play()
-            player.setAudioAttributes(AudioAttributes.DEFAULT,true)
+            player.setAudioAttributes(AudioAttributes.DEFAULT, true)
             player.playWhenReady = true
             player.addListener(object : Player.Listener {
                 override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
@@ -47,11 +51,19 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
                             binding.progressBar.visibility = View.GONE
                         }
                         ExoPlayer.STATE_ENDED -> {
-                            player.seekTo(0)
+                            //player.seekTo(0)
+                            stopPlayer(player)
                         }
                     }
                 }
             })
+        }
+
+        private fun stopPlayer(player: ExoPlayer) {
+            player.playWhenReady = false
+            player.pause()
+            player.stop()
+            player.release()
         }
     }
 }
