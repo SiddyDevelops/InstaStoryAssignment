@@ -125,6 +125,7 @@ class StoryPlayerActivity : AppCompatActivity(), MultiProgressBar.ProgressFinish
 
 
     private fun glideImage(image: String) {
+        binding.stories.start()
         binding.image.visibility = View.VISIBLE
         binding.video.visibility = View.GONE
         binding.stories.setSingleDisplayTime(5F)

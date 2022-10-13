@@ -1,6 +1,7 @@
 package com.siddydevelops.instastoryassignment.adapters
 
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ class VideoAdapter(private val videoList: ArrayList<String>) : RecyclerView.Adap
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
+        Log.d("Position",position.toString())
         holder.bindTo(videoList[position])
     }
 
