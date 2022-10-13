@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "reels_item",indices = [Index(value = ["item_name"], unique = true)])
+@Entity(tableName = "reels_item",indices = [Index(value = ["video_uri"], unique = true)])
 data class ReelsItem(
     @PrimaryKey
     @ColumnInfo(name = "video_uri")

@@ -10,7 +10,8 @@ class ReelsRepository(
 
     suspend fun delete(item: ReelsItem) = db.getReelsDAO().delete(item)
 
-    suspend fun update(item: ReelsItem) = db.getReelsDAO().update(item.video_uri,item.isLiked)
+    //suspend fun update(item: ReelsItem) = db.getReelsDAO().update(item.video_uri,item.isLiked)
+    suspend fun update(item: ReelsItem) = db.getReelsDAO().update(item)
 
     fun getAllReels() = db.getReelsDAO().getAllReels()
 }

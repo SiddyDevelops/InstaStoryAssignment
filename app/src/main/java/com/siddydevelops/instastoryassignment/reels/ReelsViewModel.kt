@@ -11,8 +11,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ReelsViewModel(application: Application): AndroidViewModel(application) {
-    private val allReels: LiveData<List<ReelsItem>>
-    private val repository: ReelsRepository
+    val allReels: LiveData<List<ReelsItem>>
+    val repository: ReelsRepository
 
     init {
         val dao = ReelsDatabase.invoke(application)

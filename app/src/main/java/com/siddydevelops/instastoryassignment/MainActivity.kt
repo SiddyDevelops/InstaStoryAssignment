@@ -23,9 +23,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.ViewModelProvider
 import com.siddydevelops.instastoryassignment.adapters.StoryViewAdapter
+import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.ActivityMainBinding
 import com.siddydevelops.instastoryassignment.reels.ReelsActivity
+import com.siddydevelops.instastoryassignment.reels.ReelsViewModel
 import com.siddydevelops.instastoryassignment.user.User
 import com.siddydevelops.instastoryassignment.user.UserData
 import java.io.*
@@ -37,11 +40,13 @@ open class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
     private var imageList: ArrayList<UserData> = arrayListOf()
-    private var videoList: ArrayList<String> = arrayListOf()
+    //private var videoList: ArrayList<String> = arrayListOf()
     private lateinit var uri: Uri
     private var currentPhotoPath: String = ""
     private var imgPath: String? = null
     private var count = 0
+
+    private lateinit var viewModel: ReelsViewModel
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,12 +69,16 @@ open class MainActivity : AppCompatActivity() {
         val data : ArrayList<User> = arrayListOf()
         data.add(User(imageList))
 
+        viewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(application)
+        )[ReelsViewModel::class.java]
+
         activityMainBinding.storyViewRV.adapter = StoryViewAdapter(data)
 
         activityMainBinding.reelsBtn.setOnClickListener {
-            Log.d("VideoList",videoList.toString())
             val intent = Intent(this, ReelsActivity::class.java)
-            intent.putStringArrayListExtra("VideoList",videoList)
+            //intent.putStringArrayListExtra("VideoList",videoList)
             startActivity(intent)
         }
 
@@ -192,7 +201,8 @@ open class MainActivity : AppCompatActivity() {
                     val resultUri = uri
                     imgPath = resultUri.path
                     count++
-                    videoList.add(uri.toString())
+                    //videoList.add(uri.toString())
+                    viewModel.insert(ReelsItem(uri.toString(),false))
                 }
             }
 
@@ -204,7 +214,8 @@ open class MainActivity : AppCompatActivity() {
                 val videoTime =
                     mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 count++
-                videoList.add(selectedImageUri.toString())
+                viewModel.insert(ReelsItem(selectedImageUri.toString(),false))
+                //videoList.add(selectedImageUri.toString())
                 activityMainBinding.imageCounter.text = "VideoCount: ${count}"
             }
         }
@@ -232,7 +243,8 @@ open class MainActivity : AppCompatActivity() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                videoList.add(getImageUri(this, selectedImageBitmap).toString())
+                viewModel.insert(ReelsItem(getImageUri(this, selectedImageBitmap).toString(),false))
+                //videoList.add(getImageUri(this, selectedImageBitmap).toString())
                 count++
                 activityMainBinding.imageCounter.text = "VideoCount: ${count}"
             }
