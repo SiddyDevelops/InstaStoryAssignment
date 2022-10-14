@@ -22,7 +22,7 @@ import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.VideoItemLayoutBinding
 import com.siddydevelops.instastoryassignment.reels.ReelsViewModel
 
-class VideoAdapter(private val reelLikedListener: ReelLikedListener, private var viewModel: ReelsViewModel) :
+class VideoAdapter(private var viewModel: ReelsViewModel) :
     RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
     private val allReels = ArrayList<ReelsItem>()
@@ -56,7 +56,7 @@ class VideoAdapter(private val reelLikedListener: ReelLikedListener, private var
             binding.progressBar.visibility = View.VISIBLE
 
             if(reelItem.isLiked) {
-                binding.likeBtn.text = "Liked!"
+                binding.likeSwitch.isChecked = true
             }
 
             val mediaItem = MediaItem.fromUri(Uri.parse(reelItem.video_uri))
@@ -79,10 +79,14 @@ class VideoAdapter(private val reelLikedListener: ReelLikedListener, private var
                 }
             })
 
-            binding.likeBtn.setOnClickListener {
-                //reelLikedListener.onReelLikedListener(reelItem)
-                viewModel.update(ReelsItem(reelItem.video_uri,true))
-                Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
+            binding.likeSwitch.setOnCheckedChangeListener { _, isChecked ->
+                if(isChecked) {
+                    viewModel.update(ReelsItem(reelItem.video_uri,true))
+                    Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.update(ReelsItem(reelItem.video_uri,false))
+                    Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -93,8 +97,4 @@ class VideoAdapter(private val reelLikedListener: ReelLikedListener, private var
             player.release()
         }
     }
-}
-
-interface ReelLikedListener {
-    fun onReelLikedListener(item: ReelsItem)
 }

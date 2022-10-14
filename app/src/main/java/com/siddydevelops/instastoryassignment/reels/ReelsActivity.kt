@@ -1,26 +1,25 @@
 package com.siddydevelops.instastoryassignment.reels
 
+import android.app.Activity
+import android.content.Intent
+import android.media.MediaMetadataRetriever
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore.Video
+import android.provider.DocumentsContract
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.siddydevelops.instastoryassignment.R
-import com.siddydevelops.instastoryassignment.adapters.ReelLikedListener
+import com.siddydevelops.instastoryassignment.MainActivity
 import com.siddydevelops.instastoryassignment.adapters.VideoAdapter
 import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.ActivityReelsBinding
-import com.siddydevelops.instastoryassignment.databinding.VideoItemLayoutBinding
 
-class ReelsActivity : AppCompatActivity(), ReelLikedListener {
+class ReelsActivity : AppCompatActivity() {
 
     private val binding by lazy {
         ActivityReelsBinding.inflate(layoutInflater)
@@ -41,7 +40,7 @@ class ReelsActivity : AppCompatActivity(), ReelLikedListener {
 
         viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application))[ReelsViewModel::class.java]
 
-        val adapter = VideoAdapter(this,viewModel)
+        val adapter = VideoAdapter(viewModel)
         binding.recyclerView.adapter = adapter
         PagerSnapHelper().attachToRecyclerView(binding.recyclerView)
 
@@ -75,10 +74,5 @@ class ReelsActivity : AppCompatActivity(), ReelLikedListener {
     override fun onBackPressed() {
         super.onBackPressed()
         finish()
-    }
-
-    override fun onReelLikedListener(item: ReelsItem) {
-        viewModel.update(item)
-        Toast.makeText(this,"Added liked to this item.", Toast.LENGTH_SHORT).show()
     }
 }

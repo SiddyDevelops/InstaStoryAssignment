@@ -99,9 +99,16 @@ open class MainActivity : AppCompatActivity() {
     }
 
     private fun selectVideoInAlbum() {
-        val intent = Intent(Intent.ACTION_PICK)
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            Intent.ACTION_GET_CONTENT
+            Intent.ACTION_OPEN_DOCUMENT
+            Intent.ACTION_OPEN_DOCUMENT_TREE
+            Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
         intent.type = "video/*"
         intent.action = Intent.ACTION_GET_CONTENT
+        intent.action= Intent.ACTION_OPEN_DOCUMENT
         startActivityForResult(Intent.createChooser(intent, "Select Video"), PICK_VIDEO_REQUEST)
     }
 
@@ -318,5 +325,6 @@ open class MainActivity : AppCompatActivity() {
         private const val REQUEST_TAKE_PHOTO = 0
         private const val CAMERA_GALLERY_REQUEST_CODE = 100
         private const val PICK_VIDEO_REQUEST = 110
+        private const val REQUEST_ACTION_OPEN = 120
     }
 }
