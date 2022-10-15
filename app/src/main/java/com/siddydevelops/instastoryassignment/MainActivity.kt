@@ -40,7 +40,6 @@ open class MainActivity : AppCompatActivity() {
 
     private lateinit var activityMainBinding: ActivityMainBinding
     private var imageList: ArrayList<UserData> = arrayListOf()
-    //private var videoList: ArrayList<String> = arrayListOf()
     private lateinit var uri: Uri
     private var currentPhotoPath: String = ""
     private var imgPath: String? = null
@@ -76,10 +75,18 @@ open class MainActivity : AppCompatActivity() {
 
         activityMainBinding.storyViewRV.adapter = StoryViewAdapter(data)
 
+        var size = 0
+        viewModel.allReels.observe(this){
+            size = it.size
+        }
+
         activityMainBinding.reelsBtn.setOnClickListener {
-            val intent = Intent(this, ReelsActivity::class.java)
-            //intent.putStringArrayListExtra("VideoList",videoList)
-            startActivity(intent)
+            if(size > 0) {
+                val intent = Intent(this, ReelsActivity::class.java)
+                startActivity(intent)
+            } else {
+                Toast.makeText(this,"Please add videos.",Toast.LENGTH_SHORT).show()
+            }
         }
 
         activityMainBinding.chooseVideoFromGallery.setOnClickListener {

@@ -1,28 +1,29 @@
 package com.siddydevelops.instastoryassignment.adapters
 
-import android.app.Application
 import android.content.Context
-import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.siddydevelops.instastoryassignment.R
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.VideoItemLayoutBinding
+import com.siddydevelops.instastoryassignment.reels.ExoPlayerItem
 import com.siddydevelops.instastoryassignment.reels.ReelsViewModel
 
-class VideoAdapter(private var viewModel: ReelsViewModel) :
+class VideoAdapter(private var context: Context,
+                   private var viewModel: ReelsViewModel,
+                   private var videoPreparedListener: OnVideoPreparedListener) :
     RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
     private val allReels = ArrayList<ReelsItem>()
@@ -30,12 +31,11 @@ class VideoAdapter(private var viewModel: ReelsViewModel) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VideoHolder {
         val binding =
             VideoItemLayoutBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return VideoHolder(binding)
+        return VideoHolder(binding,videoPreparedListener)
     }
 
     override fun onBindViewHolder(holder: VideoHolder, position: Int) {
-        Log.d("Items",allReels.toString())
-        holder.bindTo(allReels[position])
+        holder.setVideoPath(allReels[position])
     }
 
     override fun getItemCount(): Int {
@@ -48,53 +48,61 @@ class VideoAdapter(private var viewModel: ReelsViewModel) :
         notifyDataSetChanged()
     }
 
-    inner class VideoHolder(private val binding: VideoItemLayoutBinding) :
+    inner class VideoHolder(private val binding: VideoItemLayoutBinding,
+                            private var videoPreparedListener: OnVideoPreparedListener) :
         ViewHolder(binding.root) {
-        fun bindTo(reelItem: ReelsItem) {
-            val player = ExoPlayer.Builder(binding.root.context).build()
-            binding.videoView.player = player
-            binding.progressBar.visibility = View.VISIBLE
 
-            if(reelItem.isLiked) {
-                binding.likeSwitch.isChecked = true
-            }
+        private lateinit var exoPlayer: ExoPlayer
+        private lateinit var mediaSource: MediaSource
 
-            val mediaItem = MediaItem.fromUri(Uri.parse(reelItem.video_uri))
-            player.addMediaItem(mediaItem)
-            player.prepare()
-            player.play()
-            player.setAudioAttributes(AudioAttributes.DEFAULT, true)
-            player.playWhenReady = true
-            player.addListener(object : Player.Listener {
+        fun setVideoPath(reelItem: ReelsItem) {
+            exoPlayer = ExoPlayer.Builder(context).build()
+            exoPlayer.addListener(object : Player.Listener{
+                override fun onPlayerError(error: PlaybackException) {
+                    super.onPlayerError(error)
+                    Log.d("Error",error.toString())
+                    Toast.makeText(context,"Can't play this video.",Toast.LENGTH_SHORT).show()
+                }
+
                 override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                    when (playbackState) {
-                        ExoPlayer.STATE_READY -> {
-                            binding.progressBar.visibility = View.GONE
-                        }
-                        ExoPlayer.STATE_ENDED -> {
-                            //player.seekTo(0)
-                            stopPlayer(player)
-                        }
+                    if(playbackState == Player.STATE_BUFFERING) {
+                        binding.progressBar.visibility = View.VISIBLE
+                    } else if(playbackState == Player.STATE_READY) {
+                        binding.progressBar.visibility = View.GONE
                     }
                 }
             })
 
+            binding.videoView.player = exoPlayer
+            exoPlayer.seekTo(0)
+            exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+
+            val dataSourceFactory = DefaultDataSource.Factory(context)
+            mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(Uri.parse(reelItem.video_uri)))
+            exoPlayer.setMediaSource(mediaSource)
+            exoPlayer.prepare()
+
+            if(absoluteAdapterPosition == 0) {
+                exoPlayer.playWhenReady = true
+                exoPlayer.play()
+            }
+
+            videoPreparedListener.onVideoPreparedListener(ExoPlayerItem(exoPlayer, absoluteAdapterPosition))
+
             binding.likeSwitch.setOnCheckedChangeListener { _, isChecked ->
                 if(isChecked) {
-                    viewModel.update(ReelsItem(reelItem.video_uri,true))
+                    //viewModel.update(ReelsItem(reelItem.video_uri,true))
                     Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
                 } else {
-                    viewModel.update(ReelsItem(reelItem.video_uri,false))
+                    //viewModel.update(ReelsItem(reelItem.video_uri,false))
                     Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
+    }
 
-        private fun stopPlayer(player: ExoPlayer) {
-            player.playWhenReady = false
-            player.pause()
-            player.stop()
-            player.release()
-        }
+    interface OnVideoPreparedListener {
+        fun onVideoPreparedListener(exoPlayerItem: ExoPlayerItem)
     }
 }

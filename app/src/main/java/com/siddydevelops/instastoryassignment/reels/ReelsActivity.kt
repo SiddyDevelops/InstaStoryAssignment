@@ -1,22 +1,12 @@
 package com.siddydevelops.instastoryassignment.reels
 
-import android.app.Activity
-import android.content.Intent
-import android.media.MediaMetadataRetriever
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.DocumentsContract
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
-import androidx.recyclerview.widget.RecyclerView
-import com.siddydevelops.instastoryassignment.MainActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.siddydevelops.instastoryassignment.adapters.VideoAdapter
-import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.ActivityReelsBinding
 
 class ReelsActivity : AppCompatActivity() {
@@ -26,6 +16,7 @@ class ReelsActivity : AppCompatActivity() {
     }
 
     private lateinit var viewModel: ReelsViewModel
+    private val exoPlayerItems = ArrayList<ExoPlayerItem>()
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +31,13 @@ class ReelsActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application))[ReelsViewModel::class.java]
 
-        val adapter = VideoAdapter(viewModel)
-        binding.recyclerView.adapter = adapter
-        PagerSnapHelper().attachToRecyclerView(binding.recyclerView)
+        val adapter = VideoAdapter(this,viewModel,object : VideoAdapter.OnVideoPreparedListener{
+            override fun onVideoPreparedListener(exoPlayerItem: ExoPlayerItem) {
+                exoPlayerItems.add(exoPlayerItem)
+            }
+        })
+        binding.viewPager.adapter = adapter
+        //PagerSnapHelper().attachToRecyclerView(binding.recyclerView)
 
         viewModel.allReels.observe(this) { list ->
             list?.let {
@@ -50,29 +45,52 @@ class ReelsActivity : AppCompatActivity() {
             }
         }
 
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    Log.d("Position: ","${getCurrentItem()}")
-                    setCurrentItem(getCurrentItem())
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val previousIndex = exoPlayerItems.indexOfFirst { it.exoPlayer.isPlaying }
+                if(previousIndex != -1) {
+                    val player = exoPlayerItems[previousIndex].exoPlayer
+                    player.pause()
+                    player.playWhenReady = false
+                }
+                val newIndex = exoPlayerItems.indexOfFirst { it.position == position }
+                if(newIndex != -1) {
+                    val player = exoPlayerItems[newIndex].exoPlayer
+                    player.playWhenReady = true
+                    player.play()
                 }
             }
         })
-
     }
 
-    private fun getCurrentItem(): Int {
-        return (binding.recyclerView.layoutManager as LinearLayoutManager)
-            .findFirstVisibleItemPosition()
+    override fun onPause() {
+        super.onPause()
+        val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
+        if(index != -1) {
+            val player = exoPlayerItems[index].exoPlayer
+            player.pause()
+            player.playWhenReady = false
+        }
     }
 
-    private fun setCurrentItem(position: Int) {
-        binding.recyclerView.layoutManager!!.scrollToPosition(position)
+    override fun onResume() {
+        super.onResume()
+        val index = exoPlayerItems.indexOfFirst { it.position == binding.viewPager.currentItem }
+        if(index != -1) {
+            val player = exoPlayerItems[index].exoPlayer
+            player.playWhenReady = true
+            player.play()
+        }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
+    override fun onDestroy() {
+        super.onDestroy()
+        if(exoPlayerItems.isNotEmpty()) {
+            for(item in exoPlayerItems) {
+                val player = item.exoPlayer
+                player.stop()
+                player.clearMediaItems()
+            }
+        }
     }
 }
