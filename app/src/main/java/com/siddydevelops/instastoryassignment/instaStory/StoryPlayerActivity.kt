@@ -1,6 +1,7 @@
 package com.siddydevelops.instastoryassignment.instaStory
 
 import android.annotation.SuppressLint
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.View
@@ -9,6 +10,9 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
@@ -125,11 +129,38 @@ class StoryPlayerActivity : AppCompatActivity(), MultiProgressBar.ProgressFinish
 
 
     private fun glideImage(image: String) {
-        binding.stories.start()
+        binding.stories.pause()
+        binding.progressBar.visibility = View.VISIBLE
         binding.image.visibility = View.VISIBLE
         binding.video.visibility = View.GONE
         binding.stories.setSingleDisplayTime(5F)
-        Glide.with(this).load(image).into(binding.image)
+
+        Glide.with(this)
+            .load(image)
+            .listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    Toast.makeText(applicationContext,"Image failed to load!",Toast.LENGTH_SHORT).show()
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: com.bumptech.glide.request.target.Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    binding.progressBar.visibility = View.GONE
+                    binding.stories.start()
+                    return false
+                }
+            })
+            .into(binding.image)
     }
 
     @SuppressLint("ClickableViewAccessibility")
