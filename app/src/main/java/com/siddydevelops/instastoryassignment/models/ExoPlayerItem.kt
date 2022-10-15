@@ -1,8 +1,8 @@
-package com.siddydevelops.instastoryassignment.reels
+package com.siddydevelops.instastoryassignment.models
 
 import com.google.android.exoplayer2.ExoPlayer
 
-class ExoPlayerItem(
+data class ExoPlayerItem(
     var exoPlayer: ExoPlayer,
     var position: Int
 )

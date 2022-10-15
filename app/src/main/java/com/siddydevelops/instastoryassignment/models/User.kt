@@ -1,4 +1,4 @@
-package com.siddydevelops.instastoryassignment.user
+package com.siddydevelops.instastoryassignment.models
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

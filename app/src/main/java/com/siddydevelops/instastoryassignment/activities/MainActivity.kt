@@ -1,4 +1,4 @@
-package com.siddydevelops.instastoryassignment
+package com.siddydevelops.instastoryassignment.activities
 
 import android.Manifest
 import android.app.Activity
@@ -12,7 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,13 +23,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.ViewModelProvider
+import com.siddydevelops.instastoryassignment.R
 import com.siddydevelops.instastoryassignment.adapters.StoryViewAdapter
 import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.ActivityMainBinding
-import com.siddydevelops.instastoryassignment.reels.ReelsActivity
-import com.siddydevelops.instastoryassignment.reels.ReelsViewModel
-import com.siddydevelops.instastoryassignment.user.User
-import com.siddydevelops.instastoryassignment.user.UserData
+import com.siddydevelops.instastoryassignment.viewModels.ReelsViewModel
+import com.siddydevelops.instastoryassignment.models.User
+import com.siddydevelops.instastoryassignment.models.UserData
 import java.io.*
 import java.text.SimpleDateFormat
 import java.util.*

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".instaStory.StoryPlayerActivity">
+    tools:context=".activities.StoryPlayerActivity">
 
     <!--below is the image view where we will
         be displaying images in our stories-->

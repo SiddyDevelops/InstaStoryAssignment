@@ -1,4 +1,4 @@
-package com.siddydevelops.instastoryassignment.reels
+package com.siddydevelops.instastoryassignment.viewModels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

@@ -1,4 +1,4 @@
-package com.siddydevelops.instastoryassignment.reels
+package com.siddydevelops.instastoryassignment.activities
 
 import android.os.Build
 import android.os.Bundle
@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.siddydevelops.instastoryassignment.adapters.VideoAdapter
 import com.siddydevelops.instastoryassignment.databinding.ActivityReelsBinding
+import com.siddydevelops.instastoryassignment.models.ExoPlayerItem
+import com.siddydevelops.instastoryassignment.viewModels.ReelsViewModel
 
 class ReelsActivity : AppCompatActivity() {
 

@@ -4,10 +4,9 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.siddydevelops.instastoryassignment.MainActivity
 import com.siddydevelops.instastoryassignment.databinding.StoryItemLayoutBinding
-import com.siddydevelops.instastoryassignment.instaStory.StoryPlayerActivity
-import com.siddydevelops.instastoryassignment.user.User
+import com.siddydevelops.instastoryassignment.activities.StoryPlayerActivity
+import com.siddydevelops.instastoryassignment.models.User
 
 class StoryViewAdapter(private val userStories: ArrayList<User>) : RecyclerView.Adapter<StoryViewAdapter.StoryViewHolder>() {
 

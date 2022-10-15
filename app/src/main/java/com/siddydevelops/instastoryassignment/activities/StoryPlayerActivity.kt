@@ -1,4 +1,4 @@
-package com.siddydevelops.instastoryassignment.instaStory
+package com.siddydevelops.instastoryassignment.activities
 
 import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
@@ -19,7 +19,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.siddydevelops.instastoryassignment.databinding.ActivityStoryPlayerBinding
 import com.siddydevelops.instastoryassignment.progressBar.MultiProgressBar
-import com.siddydevelops.instastoryassignment.user.UserData
+import com.siddydevelops.instastoryassignment.models.UserData
 
 
 class StoryPlayerActivity : AppCompatActivity(), MultiProgressBar.ProgressFinishListener,

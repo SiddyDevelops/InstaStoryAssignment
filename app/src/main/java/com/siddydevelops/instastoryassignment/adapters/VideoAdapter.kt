@@ -18,8 +18,8 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.VideoItemLayoutBinding
-import com.siddydevelops.instastoryassignment.reels.ExoPlayerItem
-import com.siddydevelops.instastoryassignment.reels.ReelsViewModel
+import com.siddydevelops.instastoryassignment.models.ExoPlayerItem
+import com.siddydevelops.instastoryassignment.viewModels.ReelsViewModel
 
 class VideoAdapter(private var context: Context,
                    private var viewModel: ReelsViewModel,
