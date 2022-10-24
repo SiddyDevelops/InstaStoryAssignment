@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class ReelsViewModel(application: Application): AndroidViewModel(application) {
     val allReels: LiveData<List<ReelsItem>>
-    val repository: ReelsRepository
+    private val repository: ReelsRepository
 
     init {
         val dao = ReelsDatabase.invoke(application)
@@ -26,6 +26,10 @@ class ReelsViewModel(application: Application): AndroidViewModel(application) {
 
     fun update(item: ReelsItem) = viewModelScope.launch(Dispatchers.IO) {
         repository.update(item)
+    }
+
+    fun updateLike(item: ReelsItem) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateLike(item)
     }
 
     fun insert(item: ReelsItem) = viewModelScope.launch(Dispatchers.IO) {

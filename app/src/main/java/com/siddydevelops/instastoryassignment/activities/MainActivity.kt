@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -73,6 +74,9 @@ open class MainActivity : AppCompatActivity() {
         )[ReelsViewModel::class.java]
 
         activityMainBinding.storyViewRV.adapter = StoryViewAdapter(data)
+
+        viewModel.insert(ReelsItem("https://sample-videos.com/video123/mp4/480/big_buck_bunny_480p_5mb.mp4",false))
+        viewModel.insert(ReelsItem("http://techslides.com/demos/sample-videos/small.mp4",false))
 
         var size = 0
         viewModel.allReels.observe(this){
@@ -214,8 +218,7 @@ open class MainActivity : AppCompatActivity() {
                     val resultUri = uri
                     imgPath = resultUri.path
                     count++
-                    //videoList.add(uri.toString())
-                    viewModel.insert(ReelsItem(uri.toString(),false))
+                    //viewModel.insert(ReelsItem(uri.toString(),false))
                 }
             }
 
@@ -227,8 +230,7 @@ open class MainActivity : AppCompatActivity() {
                 val videoTime =
                     mediaMetadataRetriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                 count++
-                viewModel.insert(ReelsItem(selectedImageUri.toString(),false))
-                //videoList.add(selectedImageUri.toString())
+                //viewModel.insert(ReelsItem(selectedImageUri.toString(),false))
                 activityMainBinding.imageCounter.text = "VideoCount: ${count}"
             }
         }
@@ -256,8 +258,7 @@ open class MainActivity : AppCompatActivity() {
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
-                viewModel.insert(ReelsItem(getImageUri(this, selectedImageBitmap).toString(),false))
-                //videoList.add(getImageUri(this, selectedImageBitmap).toString())
+                //viewModel.insert(ReelsItem(getImageUri(this, selectedImageBitmap).toString(),false))
                 count++
                 activityMainBinding.imageCounter.text = "VideoCount: ${count}"
             }

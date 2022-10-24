@@ -2,11 +2,13 @@ package com.siddydevelops.instastoryassignment.activities
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.siddydevelops.instastoryassignment.adapters.VideoAdapter
+import com.siddydevelops.instastoryassignment.database.entities.ReelsItem
 import com.siddydevelops.instastoryassignment.databinding.ActivityReelsBinding
 import com.siddydevelops.instastoryassignment.models.ExoPlayerItem
 import com.siddydevelops.instastoryassignment.viewModels.ReelsViewModel
@@ -19,6 +21,8 @@ class ReelsActivity : AppCompatActivity() {
 
     private lateinit var viewModel: ReelsViewModel
     private val exoPlayerItems = ArrayList<ExoPlayerItem>()
+
+    private var updateReelsItems = ArrayList<ReelsItem>()
 
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,11 +37,19 @@ class ReelsActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this,ViewModelProvider.AndroidViewModelFactory.getInstance(application))[ReelsViewModel::class.java]
 
-        val adapter = VideoAdapter(this,viewModel,object : VideoAdapter.OnVideoPreparedListener{
+        val videoPreparedListener = object : VideoAdapter.OnVideoPreparedListener{
             override fun onVideoPreparedListener(exoPlayerItem: ExoPlayerItem) {
                 exoPlayerItems.add(exoPlayerItem)
             }
-        })
+        }
+
+        val reelStatusListener = object : VideoAdapter.ChangeLikeReelStatus{
+            override fun onToggleReelLike(reelItem: ReelsItem) {
+                updateReelsItems.add(reelItem)
+            }
+        }
+
+        val adapter = VideoAdapter(this,videoPreparedListener,reelStatusListener)
         binding.viewPager.adapter = adapter
         //PagerSnapHelper().attachToRecyclerView(binding.recyclerView)
 
@@ -93,6 +105,13 @@ class ReelsActivity : AppCompatActivity() {
                 player.stop()
                 player.clearMediaItems()
             }
+        }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        for(item in updateReelsItems) {
+            viewModel.updateLike(item)
         }
     }
 }

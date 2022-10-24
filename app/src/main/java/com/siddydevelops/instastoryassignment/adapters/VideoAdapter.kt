@@ -22,8 +22,8 @@ import com.siddydevelops.instastoryassignment.models.ExoPlayerItem
 import com.siddydevelops.instastoryassignment.viewModels.ReelsViewModel
 
 class VideoAdapter(private var context: Context,
-                   private var viewModel: ReelsViewModel,
-                   private var videoPreparedListener: OnVideoPreparedListener) :
+                   private var videoPreparedListener: OnVideoPreparedListener,
+                   private var reelStatus: ChangeLikeReelStatus) :
     RecyclerView.Adapter<VideoAdapter.VideoHolder>() {
 
     private val allReels = ArrayList<ReelsItem>()
@@ -56,6 +56,10 @@ class VideoAdapter(private var context: Context,
         private lateinit var mediaSource: MediaSource
 
         fun setVideoPath(reelItem: ReelsItem) {
+            if(reelItem.isLiked) {
+                binding.likeSwitch.isChecked = true
+            }
+
             exoPlayer = ExoPlayer.Builder(context).build()
             exoPlayer.addListener(object : Player.Listener{
                 override fun onPlayerError(error: PlaybackException) {
@@ -92,10 +96,10 @@ class VideoAdapter(private var context: Context,
 
             binding.likeSwitch.setOnCheckedChangeListener { _, isChecked ->
                 if(isChecked) {
-                    //viewModel.update(ReelsItem(reelItem.video_uri,true))
+                    reelStatus.onToggleReelLike(ReelsItem(reelItem.video_uri,true))
                     Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
                 } else {
-                    //viewModel.update(ReelsItem(reelItem.video_uri,false))
+                    reelStatus.onToggleReelLike(ReelsItem(reelItem.video_uri,false))
                     Toast.makeText(binding.videoView.context,"Added liked to this item.", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -104,5 +108,9 @@ class VideoAdapter(private var context: Context,
 
     interface OnVideoPreparedListener {
         fun onVideoPreparedListener(exoPlayerItem: ExoPlayerItem)
+    }
+
+    interface ChangeLikeReelStatus {
+        fun onToggleReelLike(reelItem: ReelsItem)
     }
 }
